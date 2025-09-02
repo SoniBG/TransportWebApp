@@ -1,0 +1,149 @@
+﻿@page "/Account/RegisterConfirmation"
+
+@inject UserManager<ApplicationUser> UserManager
+@inject IEmailSender EmailSender
+@inject NavigationManager NavigationManager
+@inject IdentityRedirectManager RedirectManager
+@inject ILogger<RegisterConfirmation> Logger
+@inject EmailGenerator EmailGenerator
+
+<PageTitle>Register confirmation</PageTitle>
+
+<h1>Register confirmation</h1>
+
+<StatusMessage Message="@statusMessage" />
+
+@if (emailSent)
+{
+    <div class="alert alert-success" role="alert">
+        <h4>Email Sent!</h4>
+        <p>
+            A confirmation email has been sent to <strong>@Email</strong>.
+            Please check your email and click the confirmation link to activate your account.
+        </p>
+        <p class="mb-0">
+            <small class="text-muted">
+                If you don't see the email, check your spam folder. The email may take a few minutes to arrive.
+            </small>
+        </p>
+    </div>
+
+    <div class="mt-3">
+        <button class="btn btn-outline-secondary" @onclick="ResendEmail" disabled="@isResending">
+            @if (isResending)
+            {
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <span>Resending...</span>
+            }
+            else
+            {
+                <span>Resend Email</span>
+            }
+        </button>
+    </div>
+}
+else if (emailError)
+{
+    <div class="alert alert-danger" role="alert">
+        <h4>Email Error</h4>
+        <p>
+            There was an error sending the confirmation email. Please try again or contact support.
+        </p>
+        <button class="btn btn-outline-primary" @onclick="ResendEmail" disabled="@isResending">
+            @if (isResending)
+            {
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <span>Resending...</span>
+            }
+            else
+            {
+                <span>Try Again</span>
+            }
+        </button>
+    </div>
+}
+
+@code {
+    private string? emailConfirmationLink;
+    private string? statusMessage;
+    private bool emailSent = false;
+    private bool emailError = false;
+    private bool isResending = false;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromQuery]
+    private string? Email { get; set; }
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Email is null)
+        {
+            RedirectManager.RedirectTo("");
+        }
+
+        var user = await UserManager.FindByEmailAsync(Email);
+        if (user is null)
+        {
+            HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+            statusMessage = "Error finding user for unspecified email";
+            return;
+        }
+
+        await SendConfirmationEmail(user);
+    }
+
+    private async Task SendConfirmationEmail(ApplicationUser user)
+    {
+        try
+        {
+            var userId = await UserManager.GetUserIdAsync(user);
+            var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+            var confirmationLink = NavigationManager.GetUriWithQueryParameters(
+                NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri,
+                new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code, ["returnUrl"] = ReturnUrl });
+
+            var emailSubject = "Confirm your email";
+            var emailBody = EmailGenerator.CreateEmailBody(user.Email!, confirmationLink);
+
+            await EmailSender.SendEmailAsync(user.Email!, emailSubject, emailBody);
+
+            emailSent = true;
+            emailError = false;
+            Logger.LogInformation("Confirmation email sent to {Email}", user.Email);
+        }
+        catch (Exception ex)
+        {
+            emailSent = false;
+            emailError = true;
+            Logger.LogError(ex, "Failed to send confirmation email to {Email}", user?.Email);
+        }
+    }
+
+    private async Task ResendEmail()
+    {
+        if (isResending) return;
+
+        isResending = true;
+        emailError = false;
+
+        try
+        {
+            var user = await UserManager.FindByEmailAsync(Email);
+            if (user is not null)
+            {
+                await SendConfirmationEmail(user);
+            }
+        }
+        finally
+        {
+            isResending = false;
+        }
+    }
+}

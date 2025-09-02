@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>aspnet-TransportWebApp-9370d316-bbbf-446c-b07b-187fb35723cf</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TransportWebApp.API\TransportWebApp.API.csproj" />
+    <ProjectReference Include="..\TransportWebApp.Application\TransportWebApp.Application.csproj" />
+    <ProjectReference Include="..\TransportWebApp.Domain\TransportWebApp.Domain.csproj" />
+    <ProjectReference Include="..\TransportWebApp.Persistence\TransportWebApp.Persistence.csproj" />
+  </ItemGroup>
+
+</Project>
