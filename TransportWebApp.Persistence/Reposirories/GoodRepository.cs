@@ -1,4 +1,5 @@
-﻿using TransportWebApp.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using TransportWebApp.Domain.Entities;
 using TransportWebApp.Domain.Exceptions;
 using TransportWebApp.Domain.Repositories;
 using TransportWebApp.Persistence.Data;
@@ -19,6 +20,11 @@ public class GoodRepository : IGoodRepository
         var entity = await dbContext.Goods.FindAsync(id) ?? throw new NotFoundException($"Item with {id} was not found");
 
         return entity;
+    }
+
+    public async Task<List<Good>> GetGoodsAsync()
+    {
+        return await dbContext.Goods.AsNoTracking().ToListAsync();
     }
 
     public async Task<int> CreateGoodAsync(Good entity)

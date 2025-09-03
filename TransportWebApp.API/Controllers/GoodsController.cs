@@ -1,5 +1,6 @@
 ﻿using Common.Models;
 using Microsoft.AspNetCore.Mvc;
+using TransportWebApp.Application.Services;
 using TransportWebApp.Application.Services.Interfaces;
 using TransportWebApp.Domain.Exceptions;
 
@@ -25,6 +26,20 @@ public class GoodsController : ControllerBase
             return Ok(model);
         }
         catch(NotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<List<GoodDto>>> GetAsync()
+    {
+        try
+        {
+            var modelList = await goodService.GetGoodsAsync();
+            return Ok(modelList);
+        }
+        catch (NotFoundException)
         {
             return NotFound();
         }
