@@ -30,7 +30,7 @@ public class InvoiceLineService : IInvoiceLineService
         return mapper.Map<List<InvoiceLineDto>>(entities);
     }
 
-    public async Task<int> CreateInvoiceAsync(InvoiceLineDto model)
+    public async Task<int> CreateInvoiceLineAsync(InvoiceLineDto model)
     {
         var entity = mapper.Map<InvoiceLine>(model);
         return await invoiceLineRepository.CreateInvoiceLineAsync(entity);
