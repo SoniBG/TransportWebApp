@@ -10,7 +10,7 @@ public class DeliveryDto
 
     public int? VehicleId { get; set; }
 
-    public string? VehicleIdentifier { get; set; } // e.g. plate number
+    public string? VehicleIdentifier { get; set; } 
 
     public int? DriverId { get; set; }
 
