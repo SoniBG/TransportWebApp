@@ -1,0 +1,277 @@
+﻿/* -------------------- Theme -------------------- */
+:root {
+    --boeing-blue: #0033A1; /* primary */
+    --boeing-blue-2: #1D4F91; /* darker tone (spare) */
+    --nav-text: #2b2f33;
+    --text: #1b1d1f;
+    --muted: #6b7680;
+    --border: #e6e9ee;
+    --bg: #ffffff;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* -------------------- Top info bar -------------------- */
+.infobar {
+    background: #f7f9fc;
+    color: var(--muted);
+    font-size: .92rem;
+    border-bottom: 1px solid var(--border);
+}
+
+    .infobar .container {
+        padding: .45rem 1rem;
+    }
+
+    .infobar .social {
+        display: inline-block;
+        width: 1.1rem;
+        height: 1.1rem;
+        margin-left: .75rem;
+        opacity: .75
+    }
+
+        .infobar .social:hover {
+            opacity: 1
+        }
+
+/* -------------------- Navbar -------------------- */
+.navbar-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: .5rem 0;
+}
+
+.brand {
+    color: var(--boeing-blue);
+    text-decoration: none;
+    font-weight: 800;
+    letter-spacing: .3px;
+    font-size: 1.35rem;
+    margin-right: 1rem;
+}
+
+.nav-toggle {
+    margin-left: auto;
+    background: transparent;
+    border: 0;
+    color: var(--nav-text);
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+/* -------------------- Main nav -------------------- */
+.main-nav {
+    margin-left: auto;
+}
+
+.menu {
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    gap: .25rem;
+}
+
+    .menu.open {
+        display: block;
+        position: absolute;
+        right: 1rem;
+        top: 100%;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: .25rem;
+        padding: .4rem;
+        z-index: 1030;
+    }
+
+        .menu.open .nav-link {
+            display: block;
+        }
+
+@media (min-width: 992px) {
+    .menu {
+        display: flex;
+    }
+
+    .nav-toggle {
+        display: none;
+    }
+}
+
+.nav-link {
+    color: var(--nav-text);
+    text-decoration: none;
+    padding: .85rem 1.1rem;
+    border-radius: .2rem;
+    display: inline-block;
+    font-weight: 600;
+}
+
+    .nav-link:hover {
+        color: #000;
+        background: #f1f4f9;
+    }
+
+/* Active tab: solid Boeing blue + white text */
+a.active {
+    background: var(--boeing-blue);
+    color: #fff !important;
+    border-radius: .2rem;
+}
+
+/* Dropdown (pure CSS) */
+.dropdown {
+    position: relative;
+}
+
+.dd-toggle {
+    display: none;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 180px;
+    display: none;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: .25rem;
+    padding: .35rem;
+}
+
+.dropdown-item {
+    color: var(--nav-text);
+    text-decoration: none;
+    display: block;
+    padding: .5rem .75rem;
+    border-radius: .25rem;
+}
+
+    .dropdown-item:hover {
+        background: #f1f4f9;
+        color: #000;
+    }
+
+@media (min-width: 992px) {
+    .dropdown:hover .dropdown-menu {
+        display: block;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .dropdown-menu {
+        position: static;
+        display: block;
+        margin-left: .5rem;
+    }
+}
+
+/* -------------------- Hero (home only) -------------------- */
+.hero {
+    min-height: 56vh;
+    background: linear-gradient(180deg, rgba(255,255,255,0.0), rgba(255,255,255,0.06)), repeating-linear-gradient(120deg, rgba(255,255,255,0.06) 0 14px, rgba(255,255,255,0.0) 14px 28px), linear-gradient(180deg, #4da3ff 0%, #7db7ff 40%, #a8c9ff 100%);
+    display: flex;
+    align-items: center;
+    color: #0b1a33;
+    border-bottom: 4px solid var(--boeing-blue);
+}
+
+    .hero .container {
+        padding: 4rem 1.25rem;
+    }
+
+    .hero h1 {
+        font-weight: 900;
+        font-size: clamp(2rem,6vw,3.2rem);
+        letter-spacing: .02em;
+        margin: 0 0 1rem;
+        color: #0b1a33;
+    }
+
+    .hero p {
+        font-size: clamp(1rem,2.3vw,1.2rem);
+        color: #123766;
+        margin-bottom: 1.5rem;
+    }
+
+.btn-primary {
+    background: var(--boeing-blue);
+    color: #fff;
+    border: none;
+    padding: .6rem 1.2rem;
+    border-radius: .25rem;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+    .btn-primary:hover {
+        filter: brightness(1.05);
+    }
+
+/* -------------------- Content -------------------- */
+.page-content.container {
+    max-width: 1140px;
+}
+
+/* -------------------- Auth item in nav -------------------- */
+.auth {
+    margin-left: .25rem;
+}
+
+.auth-form {
+    display: inline;
+    margin: 0;
+}
+
+    .auth-form .as-button {
+        appearance: none;
+        background: transparent;
+        border: none;
+        padding: .85rem 1.1rem;
+        font: inherit;
+        font-weight: 600;
+        color: var(--nav-text);
+        border-radius: .2rem;
+        cursor: pointer;
+    }
+
+        .auth-form .as-button:hover {
+            background: #f1f4f9;
+            color: #000;
+        }
+
+.menu.open .auth-form .as-button {
+    display: block;
+    width: 100%;
+    text-align: left;
+}
+
+
+/* --- Administration page --- */
+.admin-table .table th, .admin-table .table td {
+    vertical-align: middle;
+}
+
+.admin-table .user-cell .name {
+    font-weight: 700;
+}
+
+.admin-table .user-cell .muted {
+    font-size: .85rem;
+    color: var(--muted);
+}

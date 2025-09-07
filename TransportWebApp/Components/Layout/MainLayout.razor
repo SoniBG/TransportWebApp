@@ -1,23 +1,50 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager Nav
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
+<header class="site-header">
+    <!-- top info bar -->
+    <div class="infobar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="info-left">
+                <span class="me-4"><span class="bi bi-envelope me-1"></span> info@example.com</span>
+                <span><span class="bi bi-telephone me-1"></span> +1 5589 55488 55</span>
+            </div>
+            <div class="info-right">
+                <a href="#" class="social" aria-label="Twitter"></a>
+                <a href="#" class="social" aria-label="Facebook"></a>
+                <a href="#" class="social" aria-label="Instagram"></a>
+                <a href="#" class="social" aria-label="LinkedIn"></a>
+            </div>
+        </div>
     </div>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+    <!-- main navbar -->
+    <div class="navbar-wrap">
+        <div class="container nav-inner">
+            <a class="brand" href="/">TransportWebApp</a>
+            <button class="nav-toggle d-lg-none" @onclick="ToggleNav" aria-label="Toggle navigation">☰</button>
+            <NavMenu IsOpen="@isOpen" />
         </div>
+    </div>
+</header>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+@if (IsHome)
+{
+    <section class="hero">
+        <div class="container">
+            <h1>SECOND QUARTER RESULTS</h1>
+            <p>Clean, reliable transport management APIs and tools.</p>
+            <a class="btn-primary" href="/clients">READ MORE</a>
+        </div>
+    </section>
+}
 
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+<main class="page-content container py-4">
+    @Body
+</main>
+
+@code {
+    private bool isOpen;
+    private bool IsHome => Nav.Uri.TrimEnd('/').Equals(Nav.BaseUri.TrimEnd('/'), StringComparison.OrdinalIgnoreCase);
+    private void ToggleNav() => isOpen = !isOpen;
+}

@@ -1,0 +1,163 @@
+﻿@page "/Admin"
+@attribute [Authorize(Roles = "Admin")]
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using TransportWebApp.Persistence.Data  @* ApplicationUser namespace *@
+
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+
+<h1>Administration</h1>
+
+@if (isLoading)
+{
+    <p>Loading…</p>
+}
+else
+{
+    <div class="table-responsive admin-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th style="width: 260px;">Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in users)
+                {
+                    var locked = IsProtected(u);
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="name">@DisplayUser(u)</div>
+                                <div class="muted">@u.Email</div>
+                            </div>
+                        </td>
+                        <td class="text-start">
+                            <select class="form-select"
+                                    value="@GetRole(u.Id)"
+                                    disabled="@locked"
+                                    @onchange="(e) => ChangeRoleAsync(u, e.Value?.ToString())">
+                                @if (!HasRole(u.Id))
+                                {
+                                    <option value="" disabled selected>— Select role —</option>
+                                }
+                                @foreach (var r in roles)
+                                {
+                                    <option value="@r.Name">@r.Name</option>
+                                }
+                            </select>
+                            @if (locked)
+                            {
+                                <small class="text-muted ms-2">(locked)</small>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (!string.IsNullOrEmpty(lastError))
+    {
+        <div class="alert alert-danger mt-3">@lastError</div>
+    }
+    @if (!string.IsNullOrEmpty(lastInfo))
+    {
+        <div class="alert alert-success mt-3">@lastInfo</div>
+    }
+}
+
+@code {
+    private List<ApplicationUser> users = new();
+    private List<IdentityRole> roles = new();
+    private readonly Dictionary<string, string?> userRole = new(StringComparer.OrdinalIgnoreCase);
+    private bool isLoading;
+
+    // The seeded admin you don't want changed
+    private const string SeedAdminEmail = "admin@admin.com";
+
+    private string? lastError;
+    private string? lastInfo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+
+        roles = await RoleManager.Roles
+            .OrderBy(r => r.Name)
+            .ToListAsync();
+
+        users = await UserManager.Users
+            .OrderBy(u => u.UserName)
+            .ToListAsync();
+
+        userRole.Clear();
+        foreach (var u in users)
+        {
+            var rs = await UserManager.GetRolesAsync(u);
+            userRole[u.Id] = rs?.FirstOrDefault(); // single-role model
+        }
+
+        isLoading = false;
+    }
+
+    private string DisplayUser(ApplicationUser u) =>
+        string.IsNullOrWhiteSpace(u.UserName) ? (u.Email ?? u.Id) : u.UserName!;
+
+    private bool IsProtected(ApplicationUser u) =>
+        !string.IsNullOrWhiteSpace(u.Email)
+        && u.Email.Equals(SeedAdminEmail, StringComparison.OrdinalIgnoreCase);
+
+    private string GetRole(string userId) =>
+        userRole.TryGetValue(userId, out var r) && !string.IsNullOrWhiteSpace(r) ? r! : string.Empty;
+
+    private bool HasRole(string userId) =>
+        userRole.TryGetValue(userId, out var r) && !string.IsNullOrWhiteSpace(r);
+
+    private async Task ChangeRoleAsync(ApplicationUser user, string? newRoleName)
+    {
+        lastError = lastInfo = null;
+
+        if (IsProtected(user))
+        {
+            lastError = "The seeded administrator's role cannot be changed.";
+            StateHasChanged();
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(newRoleName))
+            return;
+
+        // If unchanged, do nothing
+        var current = userRole.TryGetValue(user.Id, out var c) ? c : null;
+        if (string.Equals(current, newRoleName, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        // Remove from all known roles, then add the selected one
+        var allRoleNames = roles.Select(r => r.Name!).ToArray();
+
+        var remove = await UserManager.RemoveFromRolesAsync(user, allRoleNames);
+        if (!remove.Succeeded)
+        {
+            lastError = string.Join("; ", remove.Errors.Select(e => e.Description));
+            StateHasChanged();
+            return;
+        }
+
+        var add = await UserManager.AddToRoleAsync(user, newRoleName);
+        if (!add.Succeeded)
+        {
+            lastError = string.Join("; ", add.Errors.Select(e => e.Description));
+            StateHasChanged();
+            return;
+        }
+
+        userRole[user.Id] = newRoleName;
+        lastInfo = $"Set role '{newRoleName}' for {DisplayUser(user)}.";
+        StateHasChanged();
+    }
+}
