@@ -59,9 +59,27 @@ public static class DependencyRegistration
 
     public static IServiceCollection RegisterDomainServices(this IServiceCollection services)
     {
+        // Repositories
+        services.AddScoped<IClientRepository, ClientRepository>();
+        services.AddScoped<IDriverRepository, DriverRepository>();
         services.AddScoped<IGoodRepository, GoodRepository>();
+        services.AddScoped<IVehicleRepository, VehicleRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+        services.AddScoped<IDeliveryRepository, DeliveryRepository>();
+        services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+        services.AddScoped<IInvoiceLineRepository, InvoiceLineRepository>();
 
+        // Services
+        services.AddScoped<IClientService, ClientService>();
+        services.AddScoped<IDriverService, DriverService>();
         services.AddScoped<IGoodService, GoodService>();
+        services.AddScoped<IVehicleService, VehicleService>();
+        services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<IOrderItemService, OrderItemService>();
+        services.AddScoped<IDeliveryService, DeliveryService>();
+        services.AddScoped<IInvoiceService, InvoiceService>();
+        services.AddScoped<IInvoiceLineService, InvoiceLineService>();
 
         return services;
     }
@@ -75,43 +93,70 @@ public static class DependencyRegistration
                 .ConvertUsing(typeof(GoodMapper));
 
             config
-                .CreateMap<GoodDto, Good>().ReverseMap();
+                .CreateMap<Good, GoodDto>();
 
             config
                 .CreateMap<AddressDto, Address>()
                 .ConvertUsing(typeof(AddressMapper));
 
             config
+                .CreateMap<Address, AddressDto>();
+
+            config
                 .CreateMap<ClientDto, Client>()
                 .ConvertUsing(typeof(ClientMapper));
+
+            config
+                .CreateMap<Client, ClientDto>();
 
             config
                 .CreateMap<DeliveryDto, Delivery>()
                 .ConvertUsing(typeof(DeliveryMapper));
 
             config
+                .CreateMap<Delivery, DeliveryDto>();
+
+            config
                 .CreateMap<DriverDto, Driver>()
                 .ConvertUsing(typeof(DriverMapper));
+
+            config
+                .CreateMap<Driver, DriverDto>();
 
             config
                 .CreateMap<InvoiceDto, Invoice>()
                 .ConvertUsing(typeof(InvoiceMapper));
 
             config
+                .CreateMap<Invoice, InvoiceDto>();
+
+            config
                 .CreateMap<InvoiceLineDto, InvoiceLine>()
                 .ConvertUsing(typeof(InvoiceLineMapper));
+
+            config
+                .CreateMap<InvoiceLine, InvoiceLineDto>();
 
             config
                 .CreateMap<OrderDto, Order>()
                 .ConvertUsing(typeof(OrderMapper));
 
             config
+                .CreateMap<Order, OrderDto>();
+
+            config
                 .CreateMap<OrderItemDto, OrderItem>()
                 .ConvertUsing(typeof(OrderItemMapper));
 
             config
+                .CreateMap<OrderItem, OrderItemDto>();
+
+            config
                 .CreateMap<VehicleDto, Vehicle>()
                 .ConvertUsing(typeof(VehicleMapper));
+
+            config
+                .CreateMap<Vehicle, VehicleDto>();
         }, loggerFactory);
 
         return mapperConfig;

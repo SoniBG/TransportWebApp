@@ -1,6 +1,5 @@
 ﻿using Common.Models;
 using Microsoft.AspNetCore.Mvc;
-using TransportWebApp.Application.Services;
 using TransportWebApp.Application.Services.Interfaces;
 using TransportWebApp.Domain.Exceptions;
 
@@ -8,35 +7,35 @@ namespace TransportWebApp.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class GoodsController : ControllerBase
+public class InvoiceLinesController : ControllerBase
 {
-    private readonly IGoodService goodService;
+    private readonly IInvoiceLineService invoiceLineService;
 
-    public GoodsController(IGoodService goodService)
+    public InvoiceLinesController(IInvoiceLineService invoiceLineService)
     {
-        this.goodService = goodService;
+        this.invoiceLineService = invoiceLineService;
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<GoodDto>> GetAsync(int id)
+    public async Task<ActionResult<InvoiceLineDto>> GetAsync(int id)
     {
         try
         {
-            var model = await goodService.GetGoodAsync(id);
+            var model = await invoiceLineService.GetInvoiceLineAsync(id);
             return Ok(model);
         }
-        catch(NotFoundException)
+        catch (NotFoundException)
         {
             return NotFound();
         }
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<GoodDto>>> GetAsync()
+    public async Task<ActionResult<List<InvoiceLineDto>>> GetAsync()
     {
         try
         {
-            var modelList = await goodService.GetGoodsAsync();
+            var modelList = await invoiceLineService.GetInvoiceLinesAsync();
             return Ok(modelList);
         }
         catch (NotFoundException)
@@ -46,20 +45,19 @@ public class GoodsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<GoodDto>> CreateAsync([FromBody] GoodDto model)
+    public async Task<ActionResult> CreateAsync([FromBody] InvoiceLineDto model)
     {
         if (!ModelState.IsValid)
         {
             return ValidationProblem(ModelState);
         }
 
-        var id = await goodService.CreateGoodAsync(model);
-
+        var id = await invoiceLineService.CreateInvoiceLineAsync(model);
         return CreatedAtAction(nameof(GetAsync), new { id }, null);
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateAsync([FromBody] GoodDto model)
+    public async Task<ActionResult> Update([FromBody] InvoiceLineDto model)
     {
         if (!ModelState.IsValid)
         {
@@ -68,7 +66,7 @@ public class GoodsController : ControllerBase
 
         try
         {
-            await goodService.UpdateGoodAsync(model);
+            await invoiceLineService.UpdateInvoiceLineAsync(model);
             return NoContent();
         }
         catch (NotFoundException)
@@ -78,11 +76,11 @@ public class GoodsController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteAsync(int id)
+    public async Task<ActionResult> Delete(int id)
     {
         try
         {
-            await goodService.DeleteGoodAsync(id);
+            await invoiceLineService.DeleteInvoiceLineAsync(id);
             return NoContent();
         }
         catch (NotFoundException)

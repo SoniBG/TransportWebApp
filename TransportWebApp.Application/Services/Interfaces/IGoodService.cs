@@ -6,6 +6,8 @@ public interface IGoodService
 {
     Task<GoodDto> GetGoodAsync(int id);
 
+    Task<List<GoodDto>> GetGoodsAsync();
+
     Task<int> CreateGoodAsync(GoodDto model);
 
     Task UpdateGoodAsync(GoodDto model);

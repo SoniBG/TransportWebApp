@@ -1,6 +1,5 @@
 ﻿using Common.Models;
 using Microsoft.AspNetCore.Mvc;
-using TransportWebApp.Application.Services;
 using TransportWebApp.Application.Services.Interfaces;
 using TransportWebApp.Domain.Exceptions;
 
@@ -8,35 +7,35 @@ namespace TransportWebApp.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class GoodsController : ControllerBase
+public class VehiclesController : ControllerBase
 {
-    private readonly IGoodService goodService;
+    private readonly IVehicleService vehicleService;
 
-    public GoodsController(IGoodService goodService)
+    public VehiclesController(IVehicleService vehicleService)
     {
-        this.goodService = goodService;
+        this.vehicleService = vehicleService;
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<GoodDto>> GetAsync(int id)
+    public async Task<ActionResult<VehicleDto>> GetAsync(int id)
     {
         try
         {
-            var model = await goodService.GetGoodAsync(id);
+            var model = await vehicleService.GetVehicleAsync(id);
             return Ok(model);
         }
-        catch(NotFoundException)
+        catch (NotFoundException)
         {
             return NotFound();
         }
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<GoodDto>>> GetAsync()
+    public async Task<ActionResult<List<VehicleDto>>> GetAsync()
     {
         try
         {
-            var modelList = await goodService.GetGoodsAsync();
+            var modelList = await vehicleService.GetVehiclesAsync();
             return Ok(modelList);
         }
         catch (NotFoundException)
@@ -46,20 +45,19 @@ public class GoodsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<GoodDto>> CreateAsync([FromBody] GoodDto model)
+    public async Task<ActionResult> CreateAsync([FromBody] VehicleDto model)
     {
         if (!ModelState.IsValid)
         {
             return ValidationProblem(ModelState);
         }
 
-        var id = await goodService.CreateGoodAsync(model);
-
+        var id = await vehicleService.CreateVehicleAsync(model);
         return CreatedAtAction(nameof(GetAsync), new { id }, null);
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateAsync([FromBody] GoodDto model)
+    public async Task<ActionResult> Update([FromBody] VehicleDto model)
     {
         if (!ModelState.IsValid)
         {
@@ -68,7 +66,7 @@ public class GoodsController : ControllerBase
 
         try
         {
-            await goodService.UpdateGoodAsync(model);
+            await vehicleService.UpdateVehicleAsync(model);
             return NoContent();
         }
         catch (NotFoundException)
@@ -78,11 +76,11 @@ public class GoodsController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteAsync(int id)
+    public async Task<ActionResult> Delete(int id)
     {
         try
         {
-            await goodService.DeleteGoodAsync(id);
+            await vehicleService.DeleteVehicleAsync(id);
             return NoContent();
         }
         catch (NotFoundException)
